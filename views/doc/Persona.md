@@ -35,7 +35,7 @@ In ihrer Freizeit macht sie nicht besonders viel. Sie fühlt sich oft überforde
 - unorganisiert, chaotisch, undiszipliniert, vergesslich, unzuverlässig, verstreut
 
 ### Ein typischer Tag:
-- verschlafen, gestresst fertig machen, auf Zug rennen, TR zu Hause vergessen
+- verschlafen, gestresst fertig machen, auf Zug rennen, TR zu Hause vergessen, HA nicht abgegeben
 
 ### Beschreibung der Person:
 - Schwarze Haare, 1.7m gross, 23 Jahre alt, überfordert
