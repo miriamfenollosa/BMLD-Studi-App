@@ -17,7 +17,7 @@ In ihrer Freizeit macht sie nicht besonders viel. Sie fühlt sich oft überforde
 - Selbstverbesserung
 - Dinge pünktlich abgeben
 
-### Angste/Hürden: 
+### Angste/Hürden:
 - Aus dem Studium rausfliegen
 - Zukunfts-/Existenzängste
 - Motivation zu verlieren, die App zu benutzen
