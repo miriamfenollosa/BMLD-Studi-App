@@ -29,7 +29,7 @@
 - Die Abläufe waren stets klar und wo der Nutzer für eine Navigation zu klicken hat, um weiterzukommen auch. Unsere Fragen konnten wir klären. Nutzer meinte ausserdem, dass die App eine wunderbare Idee sei, denn das Problem, Alles Wichtige an anderen Orten zusammensuchen zu müssen, kenne Nutzer.
 
 ### Was war schlecht
-- Schlecht ist vielleicht das falsche Wort, aber der letzte Frame empfand Nutzer als überflüssig.
+- Schlecht ist vielleicht das falsche Wort, aber der letzte Frame empfand Nutzer als überflüssig, darum lassen wir diesen weg.
 
 ### Neue Ideen?
 - Sprache auf Deutsch halten
