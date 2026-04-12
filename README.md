@@ -1,5 +1,5 @@
 # Autoren
-Fenollosa Miriam (fenolmir@students.zhaw.ch)
+Fenollosa Muñoz Miriam (fenolmir@students.zhaw.ch)
 Gjugja Laura (gjugjlau@@students.zhaw.ch)
 Ilak de Brito Miriam (ilakdmir@students.zhaw.ch)
 
