@@ -42,4 +42,3 @@ In ihrer Freizeit macht sie nicht besonders viel. Sie fühlt sich oft überforde
 
 ### Das sind meine Ziele:
 - organisierter werden, Selbstdisziplin verbessern , Noten verbessern, Wohlbefinden steigern
-dsfdsf
