@@ -9,6 +9,8 @@ Doc Ordner erstellt (in Views) und folgende Inhalte hochgeladen und ergänzt:
 - Wireframe-Nutzertest.md
 - Wireframes.jpeg
 
+README.md File ergänzt
+
 ### V03 Rechner programmieren
 Notenrechner programmieren
 
