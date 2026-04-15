@@ -1,27 +1,70 @@
-from flask import Flask, render_template, request
+import streamlit as st
+import pandas as pd
+ 
+st.title("1. Semester")
+ 
+# Fächer mit einer Note
 
-app = Flask(__name__)
+single_subjects = ["Bio", "HäHä", "MeMi", "Sys", "GeDa", "Englisch", "GKS"]
+ 
+# Fächer mit mehreren Noten
 
-# Startseite mit Tabelle
-@app.route("/")
-def index():
-    schueler = [
-        {"name": "Max", "klasse": "10A"},
-        {"name": "Anna", "klasse": "10B"}
-    ]
-    return render_template("index.html", schueler=schueler)
+multi_subjects = ["Chemie", "Mathe", "Informatik"]
+grades = {}
+ 
+st.header("Einzelnoten")
+ 
+for subject in single_subjects:
 
-# Seite für Noten
-@app.route("/noten/<name>", methods=["GET", "POST"])
-def noten(name):
-    if request.method == "POST":
-        mathe = request.form["mathe"]
-        deutsch = request.form["deutsch"]
-        englisch = request.form["englisch"]
+    grades[subject] = st.number_input(
 
-        return f"Gespeichert für {name}: {mathe}, {deutsch}, {englisch}"
+        f"{subject} Note",
+        min_value=1.0,
+        max_value=6.0,
+        step=0.1,
+        key=subject
+    )
+ 
+st.header("Mehrere Noten")
+ 
+for subject in multi_subjects:
 
-    return render_template("noten.html", name=name)
+    st.subheader(subject)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    subject_grades = []
+
+    for i in range(3):  # 3 Eingaben pro Fach
+
+        grade = st.number_input(
+
+            f"{subject} Note {i+1}",
+            min_value=1.0,
+            max_value=6.0,
+            step=0.1,
+            key=f"{subject}_{i}"
+        )
+
+        subject_grades.append(grade)
+
+    grades[subject] = subject_grades
+ 
+# Daten in Tabelle umwandeln
+
+data = []
+ 
+for subject in single_subjects:
+
+    data.append([subject, grades[subject]])
+ 
+for subject in multi_subjects:
+
+    avg = sum(grades[subject]) / len(grades[subject])
+
+    data.append([subject, round(avg, 2)])
+ 
+df = pd.DataFrame(data, columns=["Fach", "Durchschnittsnote"])
+ 
+st.header("Übersicht")
+
+st.dataframe(df)
+ 
