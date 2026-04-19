@@ -3,7 +3,7 @@ import streamlit as st
 name = st.session_state.get("name")
 vorname = name.split()[0] if name else ""
 
-st.title(f"Willkommen {vorname} 👋")
+st.title(f"Willkommen {vorname} 👋!")
 st.markdown("Remember why you started.")
 
 
