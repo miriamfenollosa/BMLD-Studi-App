@@ -1,6 +1,11 @@
 import pandas as pd 
 import streamlit as st
 
+# Eigener Code
+st.title("Hallo, Streamlit!")
+st.write ("Dies ist eine einfache Streamlit-App.")
+
+
 # --- NEW CODE: import and initialize data manager and login manager ---
 from utils.data_manager import DataManager
 from utils.login_manager import LoginManager
