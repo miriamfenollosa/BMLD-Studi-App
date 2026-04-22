@@ -1,21 +1,33 @@
 import streamlit as st
 import pandas as pd
- 
-st.title("📚 1. Semester (30 ECTS)")
- 
+
+st.title("📚 2. Semester (30 ECTS)")
+
 module_data = [
-    {"Bereich": "Wissenschaftliche Grundlagen 1", "Modul": "Biologie 1", "ECTS": 5},
-    {"Bereich": "Wissenschaftliche Grundlagen 1", "Modul": "Chemie 1", "ECTS": 3},
-    {"Bereich": "Wissenschaftliche Grundlagen 1", "Modul": "Informatik 1", "ECTS": 2},
-    {"Bereich": "Wissenschaftliche Grundlagen 1", "Modul": "Mathematik 1", "ECTS": 3},
-    {"Bereich": "Basiswissen BMLD 1", "Modul": "Hämatologie und Hämostaseologie 1", "ECTS": 2},
-    {"Bereich": "Basiswissen BMLD 1", "Modul": "Medizinische Mikrobiologie 1", "ECTS": 3},
-    {"Bereich": "Basiswissen BMLD 1", "Modul": "Systemerkrankungen", "ECTS": 3},
-    {"Bereich": "Basiswissen BMLD 1", "Modul": "Gesundheitsdaten", "ECTS": 2},
-    {"Bereich": "Sprache", "Modul": "Englisch 1", "ECTS": 2},
-    {"Bereich": "Sprache", "Modul": "GLS 1", "ECTS": 2},
-    {"Bereich": "Praktikum", "Modul": "Grundlagenpraktikum 1", "ECTS": 3}
+    # Wissenschaftliche Grundlagen
+    {"Bereich": "Wissenschaftliche Grundlagen 2", "Modul": "Biologie 2", "ECTS": 3},
+    {"Bereich": "Wissenschaftliche Grundlagen 2", "Modul": "Chemie 2", "ECTS": 3},
+    {"Bereich": "Wissenschaftliche Grundlagen 2", "Modul": "Informatik 2", "ECTS": 2},
+    {"Bereich": "Wissenschaftliche Grundlagen 2", "Modul": "Mathematik 2", "ECTS": 3},
+    {"Bereich": "Wissenschaftliche Grundlagen 2", "Modul": "Physik", "ECTS": 2},
+
+    # Sprache
+    {"Bereich": "Sprache", "Modul": "Englisch 2", "ECTS": 2},
+    {"Bereich": "Sprache", "Modul": "Gesellschaftlicher Kontext und Sprache 2", "ECTS": 2},
+
+    # Basiswissen BMLD
+    {"Bereich": "Basiswissen BMLD 2", "Modul": "Klinische Chemie und Immunologie 1", "ECTS": 2},
+    {"Bereich": "Basiswissen BMLD 2", "Modul": "Histologie und Zytologie 1", "ECTS": 3},
+    {"Bereich": "Basiswissen BMLD 2", "Modul": "Medizinische Mikrobiologie 2", "ECTS": 2},
+    {"Bereich": "Basiswissen BMLD 2", "Modul": "Hämatologie und Hämostaseologie 2", "ECTS": 3},
+
+    # Praktikum
+    {"Bereich": "Praktikum", "Modul": "Grundlagenpraktikum 2", "ECTS": 3},
 ]
+
+
+
+
  
 # Session State
 if "df" not in st.session_state:

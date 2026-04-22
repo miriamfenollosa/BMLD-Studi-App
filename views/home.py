@@ -16,4 +16,4 @@ st.markdown("Organisiere deinen Studienalltag mit unserer praktischen App! Verwa
 
 st.info("""Beachte, dass diese App für Vollzeitstudierende im Normalmodus konzipiert ist, sie ist weniger für Teilzeitstudierende oder verkürzte Studiengänge geeeignet.""")
 
-st.write("Diese App wurde von Samuel Wehrli (wehs@zhaw.ch) im Rahmen des Moduls 'BMLD Informatik 2' an der ZHAW entwickelt.")
+st.write("Diese App wurde von Laura Gjugja, Miriam Ilak de Brito und Miriam Fenollosa Muñoz im Rahmen des Moduls 'BMLD Informatik 2' an der ZHAW entwickelt.")
