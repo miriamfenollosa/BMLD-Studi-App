@@ -5,7 +5,7 @@ from functions.schnittrechner_01 import (
     berechne_bereichsschnitt,
     prüfe_praktikum
 )
-
+st.session_state.clear()
 st.title("📚 1. Semester (30 ECTS)")
 
 module_data = [
@@ -19,10 +19,10 @@ module_data = [
     {"Bereich": "Basiswissen BMLD 1", "Modul": "Systemerkrankungen", "ECTS": 3},
     {"Bereich": "Basiswissen BMLD 1", "Modul": "Gesundheitsdaten", "ECTS": 2},
 
-    {"Bereich": "Praktikum", "Modul": "Grundlagenpraktikum 1", "ECTS": 3},
-
     {"Bereich": "Sprache", "Modul": "Englisch 1", "ECTS": 2},
     {"Bereich": "Sprache", "Modul": "GKS 1", "ECTS": 2},
+
+    {"Bereich": "Praktikum", "Modul": "Grundlagenpraktikum 1", "ECTS": 3},
 ]
 
 # Session State (wichtig: eigener Name!)
