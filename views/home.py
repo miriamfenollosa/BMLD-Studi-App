@@ -10,11 +10,10 @@ st.markdown("Remember why you started.")
 
 # !! WICHTIG: Eure Emails müssen in der App erscheinen!!
 
-st.title('BMI Rechner')
+st.title('BMLD Studi App')
 
-st.markdown("Die Anwendung ermöglicht es Ihnen, Ihren BMI zu berechnen")
+st.markdown("Organisiere deinen Studienalltag mit unserer praktischen App! Verwalte deine To-Do's, deine Termine, berechne deinen Schnitt und behalte deine Hydratation im Auge - alles an einem Ort.")
 
-st.info("""Der BMI ist ein Screening-Tool, aber keine Diagnose für Körperfett oder Gesundheit.
-Bitte konsultieren Sie einen Arzt für eine vollständige Beurteilung.""")
+st.info("""Beachte, dass diese App für Vollzeitstudierende im Normalmodus konzipiert ist, sie ist weniger für Teilzeitstudierende oder verkürzte Studiengänge geeeignet.""")
 
 st.write("Diese App wurde von Samuel Wehrli (wehs@zhaw.ch) im Rahmen des Moduls 'BMLD Informatik 2' an der ZHAW entwickelt.")

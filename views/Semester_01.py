@@ -1,70 +1,200 @@
 import streamlit as st
+
 import pandas as pd
  
-st.title("1. Semester")
+st.title("📚 1. Semester (30 ECTS)")
  
-# Fächer mit einer Note
+module_data = [
 
-single_subjects = ["Bio", "HäHä", "MeMi", "Sys", "GeDa", "Englisch", "GKS"]
+    # Wissenschaftliche Grundlagen 1
+
+    {"Bereich": "Wissenschaftliche Grundlagen 1", "Modul": "Biologie 1", "ECTS": 5},
+
+    {"Bereich": "Wissenschaftliche Grundlagen 1", "Modul": "Chemie 1", "ECTS": 3},
+
+    {"Bereich": "Wissenschaftliche Grundlagen 1", "Modul": "Informatik 1", "ECTS": 2},
+
+    {"Bereich": "Wissenschaftliche Grundlagen 1", "Modul": "Mathematik 1", "ECTS": 3},
  
-# Fächer mit mehreren Noten
+    # Basiswissen BMLD 1
 
-multi_subjects = ["Chemie", "Mathe", "Informatik"]
-grades = {}
+    {"Bereich": "Basiswissen BMLD 1", "Modul": "Hämatologie und Hämostaseologie 1", "ECTS": 2},
+
+    {"Bereich": "Basiswissen BMLD 1", "Modul": "Medizinische Mikrobiologie 1", "ECTS": 3},
+
+    {"Bereich": "Basiswissen BMLD 1", "Modul": "Systemerkrankungen", "ECTS": 3},
+
+    {"Bereich": "Basiswissen BMLD 1", "Modul": "Gesundheitsdaten", "ECTS": 2},
  
-st.header("Einzelnoten")
+    # Praktikum
+
+    {"Bereich": "Praktikum", "Modul": "Grundlagenpraktikum 1", "ECTS": 3},
  
-for subject in single_subjects:
+    # Sprache
 
-    grades[subject] = st.number_input(
+    {"Bereich": "Sprache", "Modul": "Englisch 1", "ECTS": 2},
 
-        f"{subject} Note",
-        min_value=1.0,
-        max_value=6.0,
-        step=0.1,
-        key=subject
-    )
+    {"Bereich": "Sprache", "Modul": "GLS 1", "ECTS": 2},
+
+]
  
-st.header("Mehrere Noten")
+# Session State
+
+if "df" not in st.session_state:
+
+    df = pd.DataFrame(module_data)
+
+    df["Note"] = None
+
+    df["Bestanden"] = None  # NEU
+
+    st.session_state.df = df
  
-for subject in multi_subjects:
+df = st.session_state.df
+ 
+bereiche = df["Bereich"].unique()
 
-    st.subheader(subject)
+edited_dfs = []
+ 
+for bereich in bereiche:
 
-    subject_grades = []
+    st.subheader(bereich)
+ 
+    teil_df = df[df["Bereich"] == bereich]
+ 
+    # 🔥 Unterschied für Praktikum
 
-    for i in range(3):  # 3 Eingaben pro Fach
+    if bereich == "Praktikum":
 
-        grade = st.number_input(
+        edited = st.data_editor(
 
-            f"{subject} Note {i+1}",
-            min_value=1.0,
-            max_value=6.0,
-            step=0.1,
-            key=f"{subject}_{i}"
+            teil_df,
+
+            column_config={
+
+                "Modul": st.column_config.TextColumn(disabled=True),
+
+                "ECTS": st.column_config.NumberColumn(disabled=True),
+
+                "Bestanden": st.column_config.CheckboxColumn("Bestanden"),
+
+                "Note": None,  # Note wird nicht angezeigt
+
+            },
+
+            hide_index=True,
+
+            key=bereich
+
         )
 
-        subject_grades.append(grade)
+    else:
 
-    grades[subject] = subject_grades
+        edited = st.data_editor(
+
+            teil_df,
+
+            column_config={
+
+                "Modul": st.column_config.TextColumn(disabled=True),
+
+                "ECTS": st.column_config.NumberColumn(disabled=True),
+
+                "Note": st.column_config.NumberColumn(
+
+                    min_value=1.0,
+
+                    max_value=6.0,
+
+                    step=0.25
+
+                ),
+
+                "Bestanden": None,
+
+            },
+
+            hide_index=True,
+
+            key=bereich
+
+        )
  
-# Daten in Tabelle umwandeln
-
-data = []
+    edited_dfs.append(edited)
  
-for subject in single_subjects:
+# Zusammenführen
 
-    data.append([subject, grades[subject]])
+neues_df = pd.concat(edited_dfs).reset_index(drop=True)
+
+st.session_state.df = neues_df
  
-for subject in multi_subjects:
+# ---------------------------
 
-    avg = sum(grades[subject]) / len(grades[subject])
+# Berechnung
 
-    data.append([subject, round(avg, 2)])
+# ---------------------------
  
-df = pd.DataFrame(data, columns=["Fach", "Durchschnittsnote"])
+if st.button("📊 Schnitt berechnen"):
  
-st.header("Übersicht")
+    # 👉 OHNE Praktikum
 
-st.dataframe(df)
+    ohne_praktikum = neues_df[neues_df["Bereich"] != "Praktikum"]
+
+    gültig = ohne_praktikum.dropna(subset=["Note"])
+ 
+    if len(gültig) == 0:
+
+        st.error("Bitte Noten eingeben.")
+
+    else:
+
+        # 🔢 Semesterschnitt
+
+        schnitt = (gültig["Note"] * gültig["ECTS"]).sum() / gültig["ECTS"].sum()
+
+        st.success(f"🎓 Semesterschnitt: {schnitt:.2f}")
+ 
+        # ⭐ Beste / schlechteste
+
+        st.write(f"⭐ Beste Note: {gültig['Note'].max()}")
+
+        st.write(f"⚠️ Schlechteste Note: {gültig['Note'].min()}")
+ 
+        st.markdown("---")
+ 
+        # 📊 Schnitte pro Bereich
+
+        st.subheader("📊 Schnitte pro Bereich")
+ 
+        for bereich in ["Wissenschaftliche Grundlagen 1", "Basiswissen BMLD 1", "Sprache"]:
+
+            teil = neues_df[neues_df["Bereich"] == bereich].dropna(subset=["Note"])
+ 
+            if len(teil) > 0:
+
+                schnitt_bereich = (teil["Note"] * teil["ECTS"]).sum() / teil["ECTS"].sum()
+
+                st.write(f"➡️ {bereich}: {schnitt_bereich:.2f}")
+
+            else:
+
+                st.write(f"➡️ {bereich}: keine Noten vorhanden")
+ 
+        st.markdown("---")
+ 
+        # ✅ Praktikum Status
+
+        praktik = neues_df[neues_df["Bereich"] == "Praktikum"]
+ 
+        if praktik["Bestanden"].iloc[0] == True:
+
+            st.success("✅ Praktikum bestanden")
+
+        elif praktik["Bestanden"].iloc[0] == False:
+
+            st.error("❌ Praktikum nicht bestanden")
+
+        else:
+
+            st.warning("⚠️ Praktikum noch nicht bewertet")
  

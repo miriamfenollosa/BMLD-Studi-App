@@ -28,6 +28,12 @@ st.set_page_config(page_title="BMI Rechner", page_icon=":material/monitor_weight
 pg_home = st.Page("views/home.py", title="Home", icon=":material/home:", default=True)
 pg_calculator = st.Page("views/calculator.py", title="BMI-Rechner", icon=":material/calculate:")
 pg_viz  = st.Page("views/viz.py",  title="BMI Grafik",  icon=":material/show_chart:")
+pg_Semester_01 = st.Page("views/Semester_01.py", title="1. Semester", icon=":material/school:")
+pg_Semester_02 = st.Page("views/Semester_02.py", title="2. Semester", icon=":material/school:")
+pg_Semester_03 = st.Page("views/Semester_03.py", title="3. Semester", icon=":material/school:")
+pg_Semester_04 = st.Page("views/Semester_04.py", title="4. Semester", icon=":material/school:")
+pg_Semester_05 = st.Page("views/Semester_05.py", title="5. Semester", icon=":material/school:")
+pg_Semester_06 = st.Page("views/Semester_06.py", title="6. Semester", icon=":material/school:")
 
-pg = st.navigation([pg_home, pg_calculator, pg_viz])
+pg = st.navigation([pg_home, pg_calculator, pg_viz, pg_Semester_01, pg_Semester_02, pg_Semester_03, pg_Semester_04, pg_Semester_05, pg_Semester_06])
 pg.run()
