@@ -6,7 +6,7 @@ from functions.schnittrechner_01 import (
     prüfe_praktikum
 )
 
-st.title("📚 4. Semester (28 ECTS)")
+st.title("📚 4. Semester (32 ECTS)")
 
 module_data = [
 {"Bereich": "Analyseprozesse und Labordiagnostik 3", "Modul": "Immunhämatologie und Transfusionsmedizin 2", "ECTS": 2},
