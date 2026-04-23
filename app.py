@@ -23,18 +23,18 @@ if 'data_df' not in st.session_state:
     )
 # --- END OF CODE UPDATE ---
 
-st.set_page_config(page_title="BMI Rechner", page_icon=":material/monitor_weight:")
+# st.set_page_config(page_title="BMI Rechner", page_icon=":material/monitor_weight:")
 
 pg_home = st.Page("views/home.py", title="Home", icon=":material/home:", default=True)
-pg_Kalender = st.Page("views/Kalender.py", title="Kalender", icon="📅")
-pg_calculator = st.Page("views/calculator.py", title="BMI-Rechner", icon=":material/calculate:")
-pg_viz  = st.Page("views/viz.py",  title="BMI Grafik",  icon=":material/show_chart:")
+pg_todo = st.Page("views/todo.py", title="To-Do Liste", icon=":material/playlist_add:")
 pg_Semester_01 = st.Page("views/Semester_01.py", title="1. Semester", icon=":material/school:")
 pg_Semester_02 = st.Page("views/Semester_02.py", title="2. Semester", icon=":material/school:")
 pg_Semester_03 = st.Page("views/Semester_03.py", title="3. Semester", icon=":material/school:")
 pg_Semester_04 = st.Page("views/Semester_04.py", title="4. Semester", icon=":material/school:")
 pg_Semester_05 = st.Page("views/Semester_05.py", title="5. Semester", icon=":material/school:")
 pg_Semester_06 = st.Page("views/Semester_06.py", title="6. Semester", icon=":material/school:")
+pg_Wassertracker = st.Page("views/Wassertracker.py", title="Wassertracker", icon=":material/local_drink:")
+pg_Kalender = st.Page("views/Kalender.py", title="Kalender", icon=":material/calendar_month:")
 
-pg = st.navigation([pg_home, pg_Kalender, pg_calculator, pg_viz, pg_Semester_01, pg_Semester_02, pg_Semester_03, pg_Semester_04, pg_Semester_05, pg_Semester_06])
+pg = st.navigation([pg_home, pg_todo, pg_Semester_01, pg_Semester_02, pg_Semester_03, pg_Semester_04, pg_Semester_05, pg_Semester_06, pg_Wassertracker, pg_Kalender])
 pg.run()
