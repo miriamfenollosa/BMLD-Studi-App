@@ -65,6 +65,7 @@ for bereich in bereiche:
                     step=0.25
                 ),
                 "Bestanden": None,
+
             },
             hide_index=True,
             key=f"{bereich}_sem1"

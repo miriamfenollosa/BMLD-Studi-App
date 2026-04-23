@@ -1,312 +1,137 @@
-{
-"callback":
-"eventsSet"
+import streamlit as st
+from datetime import datetime
+from functions.Kalender import *
  
-"eventsSet":{
+st.title("📅 Kalender")
  
-"events":[
+# ---------------------------
+# Session State
+# ---------------------------
+if "current_month" not in st.session_state:
+    st.session_state.current_month = get_current_month()
  
-0:{
-"allDay":
-true
-"title":
-"Event 1"
-"start":
-"2023-07-03"
-"end":
-"2023-07-05"
-"backgroundColor":
-"#FF6C6C"
-"borderColor":
-"#FF6C6C"
-"resourceId":
-"a"
+if "events" not in st.session_state:
+    st.session_state.events = {}
+ 
+current = st.session_state.current_month
+today = datetime.today().strftime("%Y-%m-%d")
+ 
+# ---------------------------
+# Styling (clean & weich)
+# ---------------------------
+st.markdown("""
+<style>
+.day-box {
+    border-radius: 15px;
+    padding: 8px;
+    height: 110px;
+    background-color: #f5f5f7;
+    margin-bottom: 6px;
 }
- 
-1:{
-"allDay":
-true
-"title":
-"Event 2"
-"start":
-"2023-07-01"
-"end":
-"2023-07-10"
-"backgroundColor":
-"#FFBD45"
-"borderColor":
-"#FFBD45"
-"resourceId":
-"b"
+.today {
+    background-color: #d0e7ff;
+    border: 2px solid #4da6ff;
 }
- 
-2:{
-"allDay":
-true
-"title":
-"Event 3"
-"start":
-"2023-07-20"
-"backgroundColor":
-"#FF4B4B"
-"borderColor":
-"#FF4B4B"
-"resourceId":
-"c"
+.other-month {
+    opacity: 0.4;
 }
- 
-3:{
-"allDay":
-true
-"title":
-"Event 4"
-"start":
-"2023-07-23"
-"end":
-"2023-07-25"
-"backgroundColor":
-"#FF6C6C"
-"borderColor":
-"#FF6C6C"
-"resourceId":
-"d"
+.event {
+    background-color: #4da6ff;
+    color: white;
+    border-radius: 8px;
+    padding: 2px 6px;
+    margin-top: 3px;
+    font-size: 12px;
 }
+</style>
+""", unsafe_allow_html=True)
  
-4:{
-"allDay":
-true
-"title":
-"Event 5"
-"start":
-"2023-07-29"
-"end":
-"2023-07-30"
-"backgroundColor":
-"#FFBD45"
-"borderColor":
-"#FFBD45"
-"resourceId":
-"e"
-}
+# ---------------------------
+# Navigation
+# ---------------------------
+col1, col2, col3 = st.columns([1,2,1])
  
-5:{
-"allDay":
-true
-"title":
-"Event 6"
-"start":
-"2023-07-28"
-"backgroundColor":
-"#FF4B4B"
-"borderColor":
-"#FF4B4B"
-"resourceId":
-"f"
-}
+with col1:
+    if st.button("⬅️"):
+        st.session_state.current_month = prev_month(current)
  
-6:{
-"allDay":
-false
-"title":
-"Event 7"
-"start":
-"2023-07-01T08:30:00+02:00"
-"end":
-"2023-07-01T10:30:00+02:00"
-"backgroundColor":
-"#FF4B4B"
-"borderColor":
-"#FF4B4B"
-"resourceId":
-"a"
-}
+with col2:
+    st.subheader(current.strftime("%B %Y"))
  
-7:{
-"allDay":
-false
-"title":
-"Event 8"
-"start":
-"2023-07-01T07:30:00+02:00"
-"end":
-"2023-07-01T10:30:00+02:00"
-"backgroundColor":
-"#3D9DF3"
-"borderColor":
-"#3D9DF3"
-"resourceId":
-"b"
-}
+with col3:
+    if st.button("➡️"):
+        st.session_state.current_month = next_month(current)
  
-8:{
-"allDay":
-false
-"title":
-"Event 9"
-"start":
-"2023-07-02T10:40:00+02:00"
-"end":
-"2023-07-02T12:30:00+02:00"
-"backgroundColor":
-"#3DD56D"
-"borderColor":
-"#3DD56D"
-"resourceId":
-"c"
-}
+# ---------------------------
+# Wochentage
+# ---------------------------
+days_header = ["Mo","Di","Mi","Do","Fr","Sa","So"]
+cols = st.columns(7)
  
-9:{
-"allDay":
-false
-"title":
-"Event 10"
-"start":
-"2023-07-15T08:30:00+02:00"
-"end":
-"2023-07-15T10:30:00+02:00"
-"backgroundColor":
-"#FF4B4B"
-"borderColor":
-"#FF4B4B"
-"resourceId":
-"d"
-}
+for i, d in enumerate(days_header):
+    cols[i].markdown(f"**{d}**")
  
-10:{
-"allDay":
-false
-"title":
-"Event 11"
-"start":
-"2023-07-15T07:30:00+02:00"
-"end":
-"2023-07-15T10:30:00+02:00"
-"backgroundColor":
-"#3DD56D"
-"borderColor":
-"#3DD56D"
-"resourceId":
-"e"
-}
+# ---------------------------
+# Kalender
+# ---------------------------
+days = generate_calendar_days(current)
  
-11:{
-"allDay":
-false
-"title":
-"Event 12"
-"start":
-"2023-07-21T10:40:00+02:00"
-"end":
-"2023-07-21T12:30:00+02:00"
-"backgroundColor":
-"#3D9DF3"
-"borderColor":
-"#3D9DF3"
-"resourceId":
-"f"
-}
+for week in range(6):
+    cols = st.columns(7)
  
-12:{
-"allDay":
-false
-"title":
-"Event 13"
-"start":
-"2023-07-17T08:30:00+02:00"
-"end":
-"2023-07-17T10:30:00+02:00"
-"backgroundColor":
-"#FF4B4B"
-"borderColor":
-"#FF4B4B"
-"resourceId":
-"a"
-}
+    for i in range(7):
+        day = days[week * 7 + i]
+        date_str = day.strftime("%Y-%m-%d")
  
-13:{
-"allDay":
-false
-"title":
-"Event 14"
-"start":
-"2023-07-17T09:30:00+02:00"
-"end":
-"2023-07-17T11:30:00+02:00"
-"backgroundColor":
-"#3D9DF3"
-"borderColor":
-"#3D9DF3"
-"resourceId":
-"b"
-}
+        with cols[i]:
+            classes = "day-box"
+            if date_str == today:
+                classes += " today"
+            if day.month != current.month:
+                classes += " other-month"
  
-14:{
-"allDay":
-false
-"title":
-"Event 15"
-"start":
-"2023-07-17T10:30:00+02:00"
-"end":
-"2023-07-17T12:30:00+02:00"
-"backgroundColor":
-"#3DD56D"
-"borderColor":
-"#3DD56D"
-"resourceId":
-"c"
-}
+            st.markdown(f"<div class='{classes}'>", unsafe_allow_html=True)
  
-15:{
-"allDay":
-false
-"title":
-"Event 16"
-"start":
-"2023-07-17T13:30:00+02:00"
-"end":
-"2023-07-17T14:30:00+02:00"
-"backgroundColor":
-"#FF6C6C"
-"borderColor":
-"#FF6C6C"
-"resourceId":
-"d"
-}
+            # Datum anzeigen
+            st.markdown(f"**{day.day}**")
  
-16:{
-"allDay":
-false
-"title":
-"Event 17"
-"start":
-"2023-07-17T15:30:00+02:00"
-"end":
-"2023-07-17T16:30:00+02:00"
-"backgroundColor":
-"#FFBD45"
-"borderColor":
-"#FFBD45"
-"resourceId":
-"e"
-}
-]
+            # Events anzeigen
+            if date_str in st.session_state.events:
+                for ev in st.session_state.events[date_str]:
+                    st.markdown(
+                        f"<div class='event'>{ev['time']} - {ev['text']}</div>",
+                        unsafe_allow_html=True
+                    )
  
-"view":{
-"type":
-"dayGridMonth"
-"title":
-"July 2023"
-"activeStart":
-"2023-06-24T22:00:00.000Z"
-"activeEnd":
-"2023-08-05T22:00:00.000Z"
-"currentStart":
-"2023-06-30T22:00:00.000Z"
-"currentEnd":
-"2023-07-31T22:00:00.000Z"
-}
-}
-}
+            st.markdown("</div>", unsafe_allow_html=True)
  
+            # 👉 KLICK AUF TAG (unsichtbarer Button)
+            if st.button("", key=f"day_{date_str}"):
+                st.session_state.selected_day = date_str
  
+# ---------------------------
+# Event direkt eingeben
+# ---------------------------
+if "selected_day" in st.session_state:
+    st.markdown("---")
+    st.subheader(f"📌 {st.session_state.selected_day}")
+ 
+    col1, col2 = st.columns(2)
+ 
+    with col1:
+        text = st.text_input("Termin")
+ 
+    with col2:
+        time = st.time_input("Zeit")
+ 
+    if st.button("Speichern"):
+        if st.session_state.selected_day not in st.session_state.events:
+            st.session_state.events[st.session_state.selected_day] = []
+ 
+        st.session_state.events[st.session_state.selected_day].append({
+            "text": text,
+            "time": time.strftime("%H:%M")
+        })
+ 
+        st.success("Gespeichert!")
+        st.rerun()

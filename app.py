@@ -36,5 +36,5 @@ pg_Semester_06 = st.Page("views/Semester_06.py", title="6. Semester", icon=":mat
 pg_Wassertracker = st.Page("views/Wassertracker.py", title="Wassertracker", icon=":material/local_drink:")
 pg_Kalender = st.Page("views/Kalender.py", title="Kalender", icon=":material/calendar_month:")
 
-pg = st.navigation([pg_home, pg_todo, pg_Semester_01, pg_Semester_02, pg_Semester_03, pg_Semester_04, pg_Semester_05, pg_Semester_06, pg_Wassertracker, pg_Kalender])
+pg = st.navigation([pg_home, pg_todo, pg_Kalender, pg_Semester_01, pg_Semester_02, pg_Semester_03, pg_Semester_04, pg_Semester_05, pg_Semester_06, pg_Wassertracker])
 pg.run()
