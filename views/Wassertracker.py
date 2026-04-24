@@ -20,17 +20,33 @@ if "goal" not in st.session_state:
 
 history = st.session_state.history
 
-# aktuelles Datum
 today = get_today()
 
+# ---------------------------
+# Ziel → Gläser berechnen
+# ---------------------------
+GLASS_SIZE = 0.25
+num_glasses = int(st.session_state.goal / GLASS_SIZE)
+num_glasses = max(1, min(num_glasses, 20))  # Sicherheitslimit
+
+# ---------------------------
 # neuen Tag initialisieren
-history = init_day(history)
+# ---------------------------
+history = init_day(history, num_glasses)
 st.session_state.history = history
 
-# Datum anzeigen
-st.subheader(f"📅 Heute: {today}")
-
 today_data = history[today]
+
+# Falls Ziel geändert wurde → Liste anpassen
+if len(today_data) != num_glasses:
+    today_data = [False] * num_glasses
+    history[today] = today_data
+    st.session_state.history = history
+
+# ---------------------------
+# Datum anzeigen
+# ---------------------------
+st.subheader(f"📅 Heute: {today}")
 
 # ---------------------------
 # Zielmengenrechner
@@ -43,6 +59,7 @@ with st.expander("⚙️ Zielmengenrechner"):
         step=0.5,
         value=70.0
     )
+
     empfehlung = gewicht * 0.035
     st.write(f"💡 Empfohlene Tagesmenge: **{empfehlung:.2f} L**")
 
@@ -53,7 +70,7 @@ with st.expander("⚙️ Zielmengenrechner"):
 goal = st.session_state.goal
 
 # ---------------------------
-# CSS für klickbare Boxen
+# CSS für Buttons
 # ---------------------------
 st.markdown("""
 <style>
@@ -66,34 +83,27 @@ div.stButton > button {
     font-size: 24px;
     cursor: pointer;
     background-color: white;
-    transition: background-color 0.2s;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------------------
-# Boxen anzeigen (2 Reihen)
+# Wasser-Boxen dynamisch
 # ---------------------------
+st.subheader(f"💧 Deine Gläser ({num_glasses})")
+
 cols = st.columns(4)
 
-for i in range(4):
-    with cols[i]:
+for i in range(num_glasses):
+    col = cols[i % 4]
+    with col:
         icon = "💧" if today_data[i] else ""
-        if st.button(icon, key=f"top_{i}"):
-            st.session_state.history[today] = toggle_glass(today_data, i)
-            st.rerun()
-
-cols2 = st.columns(4)
-
-for i in range(4, 8):
-    with cols2[i - 4]:
-        icon = "💧" if today_data[i] else ""
-        if st.button(icon, key=f"bottom_{i}"):
+        if st.button(icon, key=f"glass_{i}"):
             st.session_state.history[today] = toggle_glass(today_data, i)
             st.rerun()
 
 # ---------------------------
-# Berechnung & Zielanzeige
+# Berechnung
 # ---------------------------
 total = calculate_water(today_data)
 
@@ -102,4 +112,4 @@ st.markdown(f"### 💧 Getrunken: {total:.2f} L")
 if total >= goal:
     st.success(f"🎯 Ziel erreicht! ({goal:.2f} L)")
 else:
-    st.info(f"Ziel: {goal:.2f} L")
+    st.info(f"Ziel: {goal:.2f} L ({num_glasses} Gläser)")
