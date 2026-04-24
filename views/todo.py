@@ -9,9 +9,9 @@ st.title("To-Do Liste 📝")
 # SESSION STATE
 if "todo_df" not in st.session_state:
     st.session_state.todo_df = pd.DataFrame({
-        "Fälligkeit": [],
-        "Eintrag": [],
-        "Erledigt": []
+        "Fälligkeit": pd.Series(dtype="datetime64[ns]"),
+        "Eintrag": pd.Series(dtype="str"),
+        "Erledigt": pd.Series(dtype="bool")
     })
 
 if "Erledigt" not in st.session_state.todo_df.columns:
