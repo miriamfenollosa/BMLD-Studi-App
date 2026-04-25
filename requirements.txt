@@ -1,5 +1,6 @@
 streamlit
-streamlit-authenticator
+supabase
+Pillow
 pandas
 pyyaml
 webdav4
