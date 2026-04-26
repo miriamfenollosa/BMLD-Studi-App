@@ -5,3 +5,5 @@ pandas
 pyyaml
 webdav4
 fsspec
+streamlit-authenticator
+webdavclient3
