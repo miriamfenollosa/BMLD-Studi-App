@@ -12,7 +12,7 @@ st.markdown("Remember why you started.")
 
 st.title('BMLD Studi App')
 
-st.markdown("Organisiere deinen Studienalltag mit unserer praktischen App! Verwalte deine To-Do's, deine Termine, berechne deinen Schnitt und behalte deine Hydratation im Auge - alles an einem Ort.")
+st.markdown("Organisiere deinen Studienalltag mit unserer praktischen App! Verwalte deine To-Do's, deinen Kalender, deinen Stundenplan, berechne deinen Schnitt und behalte deine Hydratation im Auge - alles an einem Ort.")
 
 st.info("""Beachte, dass diese App für Vollzeitstudierende im Normalmodus konzipiert ist, sie ist weniger für Teilzeitstudierende oder Studierende des verkürzten Modus geeignet.""")
 
