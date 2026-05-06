@@ -1,23 +1,32 @@
 import streamlit as st
 from datetime import datetime
+import pandas as pd
+
 from functions.Kalender import *
- 
+from utils.data_manager import DataManager
+
+# DataManager holen
+data_manager = DataManager()
+
 st.title("📅 Kalender")
- 
+
 # ---------------------------
-# Session State
+# Session State + LADEN
 # ---------------------------
 if "current_month" not in st.session_state:
     st.session_state.current_month = get_current_month()
- 
+
 if "events" not in st.session_state:
-    st.session_state.events = {}
- 
+    st.session_state.events = data_manager.load_user_data(
+        "calendar_events.json",
+        initial_value={}
+    )
+
 current = st.session_state.current_month
 today = datetime.today().strftime("%Y-%m-%d")
- 
+
 # ---------------------------
-# Styling (clean & weich)
+# Styling
 # ---------------------------
 st.markdown("""
 <style>
@@ -45,56 +54,55 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
- 
+
 # ---------------------------
 # Navigation
 # ---------------------------
 col1, col2, col3 = st.columns([1,2,1])
- 
+
 with col1:
     if st.button("⬅️"):
         st.session_state.current_month = prev_month(current)
- 
+
 with col2:
     st.subheader(current.strftime("%B %Y"))
- 
+
 with col3:
     if st.button("➡️"):
         st.session_state.current_month = next_month(current)
- 
+
 # ---------------------------
 # Wochentage
 # ---------------------------
 days_header = ["Mo","Di","Mi","Do","Fr","Sa","So"]
 cols = st.columns(7)
- 
+
 for i, d in enumerate(days_header):
     cols[i].markdown(f"**{d}**")
- 
+
 # ---------------------------
 # Kalender
 # ---------------------------
 days = generate_calendar_days(current)
- 
+
 for week in range(6):
     cols = st.columns(7)
- 
+
     for i in range(7):
         day = days[week * 7 + i]
         date_str = day.strftime("%Y-%m-%d")
- 
+
         with cols[i]:
             classes = "day-box"
             if date_str == today:
                 classes += " today"
             if day.month != current.month:
                 classes += " other-month"
- 
+
             st.markdown(f"<div class='{classes}'>", unsafe_allow_html=True)
- 
-            # Datum anzeigen
+
             st.markdown(f"**{day.day}**")
- 
+
             # Events anzeigen
             if date_str in st.session_state.events:
                 for ev in st.session_state.events[date_str]:
@@ -102,36 +110,42 @@ for week in range(6):
                         f"<div class='event'>{ev['time']} - {ev['text']}</div>",
                         unsafe_allow_html=True
                     )
- 
+
             st.markdown("</div>", unsafe_allow_html=True)
- 
-            # 👉 KLICK AUF TAG (unsichtbarer Button)
+
             if st.button("", key=f"day_{date_str}"):
                 st.session_state.selected_day = date_str
- 
+
 # ---------------------------
-# Event direkt eingeben
+# Event eingeben
 # ---------------------------
 if "selected_day" in st.session_state:
     st.markdown("---")
     st.subheader(f"📌 {st.session_state.selected_day}")
- 
+
     col1, col2 = st.columns(2)
- 
+
     with col1:
         text = st.text_input("Termin")
- 
+
     with col2:
         time = st.time_input("Zeit")
- 
+
     if st.button("Speichern"):
         if st.session_state.selected_day not in st.session_state.events:
             st.session_state.events[st.session_state.selected_day] = []
- 
+
         st.session_state.events[st.session_state.selected_day].append({
             "text": text,
             "time": time.strftime("%H:%M")
         })
- 
+
+        # 🔥 SPEICHERN !!!
+        data_manager.save_user_data(
+            st.session_state.events,
+            "calendar_events.json"
+        )
+
         st.success("Gespeichert!")
         st.rerun()
+

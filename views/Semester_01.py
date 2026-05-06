@@ -5,7 +5,7 @@ from functions.schnittrechner_01 import (
     berechne_bereichsschnitt,
     prüfe_praktikum
 )
-st.session_state.clear()
+
 st.title("📚 1. Semester (30 ECTS)")
 
 module_data = [

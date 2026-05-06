@@ -74,7 +74,7 @@ for bereich in bereiche:
 
 # Zusammenführen
 neues_df = pd.concat(edited_dfs).reset_index(drop=True)
-st.session_state.df_sem1 = neues_df
+st.session_state.df_sem4 = neues_df
 
 st.markdown("---")
 

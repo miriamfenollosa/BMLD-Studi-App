@@ -54,7 +54,7 @@ for bereich in bereiche:
                 "Note": None,
             },
             hide_index=True,
-            key=f"{bereich}_sem1"
+            key=f"{bereich}_sem2"
         )
     else:
         edited = st.data_editor(
@@ -70,7 +70,7 @@ for bereich in bereiche:
                 "Bestanden": None,
             },
             hide_index=True,
-            key=f"{bereich}_sem1"
+            key=f"{bereich}_sem2"
         )
 
         schnitt_bereich = berechne_bereichsschnitt(edited, bereich)
@@ -83,7 +83,7 @@ for bereich in bereiche:
     edited_dfs.append(edited)
 
 neues_df = pd.concat(edited_dfs).reset_index(drop=True)
-st.session_state.df_sem1 = neues_df
+st.session_state.df_sem2 = neues_df
 
 st.markdown("---")
 
