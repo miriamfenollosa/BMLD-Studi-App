@@ -5,15 +5,25 @@ from functions.Wassertracker import (
     toggle_glass,
     calculate_water
 )
+from utils.data_manager import DataManager
 
 st.title("Wassertracker 💧")
 st.write("1 Glas = 0.25L")
 
 # ---------------------------
+# Initialize DataManager
+# ---------------------------
+data_manager = DataManager()
+
+# ---------------------------
 # Session State
 # ---------------------------
 if "history" not in st.session_state:
-    st.session_state.history = {}
+    # Load history from persisted file, or use empty dict as default
+    st.session_state.history = data_manager.load_user_data(
+        'water_tracker.json',
+        initial_value={}
+    )
 
 if "goal" not in st.session_state:
     st.session_state.goal = 2.0
@@ -42,6 +52,8 @@ if len(today_data) != num_glasses:
     today_data = [False] * num_glasses
     history[today] = today_data
     st.session_state.history = history
+    # Persist changes
+    data_manager.save_user_data(st.session_state.history, 'water_tracker.json')
 
 # ---------------------------
 # Datum anzeigen
@@ -65,7 +77,15 @@ with st.expander("⚙️ Zielmengenrechner"):
 
     if st.button("Als Ziel übernehmen"):
         st.session_state.goal = empfehlung
+        # Reset glasses for today with new number
+        num_glasses_new = int(empfehlung / GLASS_SIZE)
+        num_glasses_new = max(1, min(num_glasses_new, 20))
+        history[today] = [False] * num_glasses_new
+        st.session_state.history = history
+        # Persist changes
+        data_manager.save_user_data(st.session_state.history, 'water_tracker.json')
         st.success(f"✅ Ziel auf {empfehlung:.2f} L gesetzt!")
+        st.rerun()
 
 goal = st.session_state.goal
 
@@ -97,9 +117,12 @@ cols = st.columns(4)
 for i in range(num_glasses):
     col = cols[i % 4]
     with col:
-        icon = "💧" if today_data[i] else ""
+        # Show icon based on current state, not on click
+        icon = "💧" if today_data[i] else "🥤"
         if st.button(icon, key=f"glass_{i}"):
             st.session_state.history[today] = toggle_glass(today_data, i)
+            # Persist changes
+            data_manager.save_user_data(st.session_state.history, 'water_tracker.json')
             st.rerun()
 
 # ---------------------------

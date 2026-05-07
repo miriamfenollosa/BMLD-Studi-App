@@ -3,18 +3,29 @@ import pandas as pd
 from datetime import date
 
 from functions.todo import add_todo, remove_done
+from utils.data_manager import DataManager
 
 st.title("To-Do Liste 📝")
+
+# ---------------------------
+# Initialize DataManager
+# ---------------------------
+data_manager = DataManager()
 
 # ---------------------------
 # SESSION STATE (WICHTIG)
 # ---------------------------
 if "todo_df" not in st.session_state:
-    st.session_state.todo_df = pd.DataFrame({
-        "Fälligkeit": pd.Series(dtype="datetime64[ns]"),
-        "Eintrag": pd.Series(dtype="str"),
-        "Erledigt": pd.Series(dtype="bool")
-    })
+    # Load todos from persisted file, or use empty DataFrame as default
+    st.session_state.todo_df = data_manager.load_user_data(
+        'todo.csv',
+        initial_value=pd.DataFrame({
+            "Fälligkeit": pd.Series(dtype="datetime64[ns]"),
+            "Eintrag": pd.Series(dtype="str"),
+            "Erledigt": pd.Series(dtype="bool")
+        }),
+        parse_dates=['Fälligkeit']
+    )
 
 # ---------------------------
 # EINGABE
@@ -34,6 +45,8 @@ if st.button("➕ Eintrag hinzufügen"):
             selected_date,
             entry
         )
+        # Persist to file
+        data_manager.save_user_data(st.session_state.todo_df, 'todo.csv')
         st.success("Eintrag gespeichert!")
         st.rerun()
 
@@ -65,6 +78,8 @@ edited_df = st.data_editor(
 )
 
 st.session_state.todo_df = edited_df
+# Persist changes to file
+data_manager.save_user_data(st.session_state.todo_df, 'todo.csv')
 
 # ---------------------------
 # BUTTONS
@@ -78,9 +93,13 @@ with col1:
             "Eintrag": pd.Series(dtype="str"),
             "Erledigt": pd.Series(dtype="bool")
         })
+        # Persist to file
+        data_manager.save_user_data(st.session_state.todo_df, 'todo.csv')
         st.rerun()
 
 with col2:
     if st.button("☑️ Erledigte löschen"):
         st.session_state.todo_df = remove_done(st.session_state.todo_df)
+        # Persist to file
+        data_manager.save_user_data(st.session_state.todo_df, 'todo.csv')
         st.rerun()

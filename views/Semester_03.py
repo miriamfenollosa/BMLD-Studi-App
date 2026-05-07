@@ -5,8 +5,14 @@ from functions.schnittrechner_01 import (
     berechne_bereichsschnitt,
     prüfe_praktikum
 )
+from utils.data_manager import DataManager
 
 st.title("📚 3. Semester (28 ECTS)")
+
+# ---------------------------
+# Initialize DataManager
+# ---------------------------
+data_manager = DataManager()
 
 module_data = [
     {"Bereich": "Analyseprozesse und Labordiagnostik 1", "Modul": "Klinische Chemie und Immunologie 2", "ECTS": 2},
@@ -24,10 +30,21 @@ module_data = [
 
 # Session State (wichtig: eigener Name!)
 if "df_sem3" not in st.session_state:
-    df = pd.DataFrame(module_data)
-    df["Note"] = None
-    df["Bestanden"] = None
-    st.session_state.df_sem3 = df
+    # Load grades from persisted file, or create empty DataFrame with module data
+    default_df = pd.DataFrame(module_data)
+    default_df["Note"] = None
+    default_df["Bestanden"] = None
+    
+    loaded_df = data_manager.load_user_data(
+        'semester_03_grades.csv',
+        initial_value=default_df
+    )
+    
+    # Clean up data types: convert Note to float, Bestanden to bool, handle NaN
+    loaded_df["Note"] = pd.to_numeric(loaded_df["Note"], errors="coerce")
+    loaded_df["Bestanden"] = loaded_df["Bestanden"].fillna(False).astype(bool)
+    
+    st.session_state.df_sem3 = loaded_df
 
 df = st.session_state.df_sem3
 
@@ -79,6 +96,9 @@ for bereich in bereiche:
 # Zusammenführen
 neues_df = pd.concat(edited_dfs).reset_index(drop=True)
 st.session_state.df_sem3 = neues_df
+
+# Persist grades to file
+data_manager.save_user_data(st.session_state.df_sem3, 'semester_03_grades.csv')
 
 st.markdown("---")
 

@@ -5,25 +5,42 @@ from functions.schnittrechner_01 import (
     berechne_bereichsschnitt,
     prüfe_praktikum
 )
+from utils.data_manager import DataManager
 
 st.title("📚 6. Semester (27 ECTS)")
 
-module_data = [
-        {"Bereich": "Gesundheitssystem", "Modul": "Klinische Pharmakologie und personalisierte Medizin", "ECTS": 4},
-        {"Bereich": "Gesundheitssystem", "Modul": "Gesundheitssystem und Digital Health", "ECTS": 2},
+# ---------------------------
+# Initialize DataManager
+# ---------------------------
+data_manager = DataManager()
 
-        {"Bereich": "Kommunikation und Management 2", "Modul": "Projekt-, Change- und Risikomanagement 2", "ECTS": 2},
-        {"Bereich": "Kommunikation und Management 2", "Modul": "Forschungsmethoden 2", "ECTS": 2},
-        {"Bereich": "Kommunikation und Management 2", "Modul": "Kommunikation 2", "ECTS": 2},
-        {"Bereich": "Bachelorarbeit", "Modul": "Bachelorarbeit", "ECTS": 15},
-    ]
+module_data = [
+    {"Bereich": "Gesundheitssystem", "Modul": "Klinische Pharmakologie und personalisierte Medizin", "ECTS": 4},
+    {"Bereich": "Gesundheitssystem", "Modul": "Gesundheitssystem und Digital Health", "ECTS": 2},
+
+    {"Bereich": "Kommunikation und Management 2", "Modul": "Projekt-, Change- und Risikomanagement 2", "ECTS": 2},
+    {"Bereich": "Kommunikation und Management 2", "Modul": "Forschungsmethoden 2", "ECTS": 2},
+    {"Bereich": "Kommunikation und Management 2", "Modul": "Kommunikation 2", "ECTS": 2},
+    {"Bereich": "Bachelorarbeit", "Modul": "Bachelorarbeit", "ECTS": 15},
+]
 
 # Session State
 if "df_sem6" not in st.session_state:
-    df = pd.DataFrame(module_data)
-    df["Note"] = None
-    df["Bestanden"] = None
-    st.session_state.df_sem6 = df
+    # Load grades from persisted file, or create empty DataFrame with module data
+    default_df = pd.DataFrame(module_data)
+    default_df["Note"] = None
+    default_df["Bestanden"] = None
+    
+    loaded_df = data_manager.load_user_data(
+        'semester_06_grades.csv',
+        initial_value=default_df
+    )
+    
+    # Clean up data types: convert Note to float, Bestanden to bool, handle NaN
+    loaded_df["Note"] = pd.to_numeric(loaded_df["Note"], errors="coerce")
+    loaded_df["Bestanden"] = loaded_df["Bestanden"].fillna(False).astype(bool)
+    
+    st.session_state.df_sem6 = loaded_df
 
 df = st.session_state.df_sem6
 
@@ -75,6 +92,9 @@ for bereich in bereiche:
 # Zusammenführen
 neues_df = pd.concat(edited_dfs).reset_index(drop=True)
 st.session_state.df_sem6 = neues_df
+
+# Persist grades to file
+data_manager.save_user_data(st.session_state.df_sem6, 'semester_06_grades.csv')
 
 st.markdown("---")
 

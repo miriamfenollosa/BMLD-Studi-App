@@ -78,7 +78,8 @@ class DataManager:
             try:
                 return fsspec.filesystem('webdav',
                                          base_url=secrets['base_url'],
-                                         auth=(secrets['username'], secrets['password']))
+                                         auth=(secrets['username'], secrets['password']),
+                                         timeout=30)  # erhöhter Timeout für langsame Verbindungen
             except Exception as e:
                 st.error(f"Verbindung zu WebDAV fehlgeschlagen: {e}")
                 st.stop()

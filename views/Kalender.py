@@ -1,32 +1,39 @@
 import streamlit as st
 from datetime import datetime
-import pandas as pd
-
 from functions.Kalender import *
 from utils.data_manager import DataManager
-
-# DataManager holen
-data_manager = DataManager()
 
 st.title("📅 Kalender")
 
 # ---------------------------
-# Session State + LADEN
+# Initialize DataManager
+# ---------------------------
+data_manager = DataManager()
+
+# ---------------------------
+# Session State
 # ---------------------------
 if "current_month" not in st.session_state:
     st.session_state.current_month = get_current_month()
 
 if "events" not in st.session_state:
+    # Load events from persisted file, or use empty dict as default
     st.session_state.events = data_manager.load_user_data(
-        "calendar_events.json",
+        'calendar_events.json',
         initial_value={}
     )
+
+if "selected_day" not in st.session_state:
+    st.session_state.selected_day = None
+
+if "edit_index" not in st.session_state:
+    st.session_state.edit_index = None
 
 current = st.session_state.current_month
 today = datetime.today().strftime("%Y-%m-%d")
 
 # ---------------------------
-# Styling
+# Styling (clean & weich)
 # ---------------------------
 st.markdown("""
 <style>
@@ -36,13 +43,6 @@ st.markdown("""
     height: 110px;
     background-color: #f5f5f7;
     margin-bottom: 6px;
-}
-.today {
-    background-color: #d0e7ff;
-    border: 2px solid #4da6ff;
-}
-.other-month {
-    opacity: 0.4;
 }
 .event {
     background-color: #4da6ff;
@@ -93,59 +93,101 @@ for week in range(6):
         date_str = day.strftime("%Y-%m-%d")
 
         with cols[i]:
+            # Skip days from other months
+            if day.month != current.month:
+                st.markdown("")  # Empty placeholder
+                continue
+
             classes = "day-box"
             if date_str == today:
                 classes += " today"
-            if day.month != current.month:
-                classes += " other-month"
 
             st.markdown(f"<div class='{classes}'>", unsafe_allow_html=True)
 
+            # Datum anzeigen
             st.markdown(f"**{day.day}**")
 
             # Events anzeigen
             if date_str in st.session_state.events:
                 for ev in st.session_state.events[date_str]:
                     st.markdown(
-                        f"<div class='event'>{ev['time']} - {ev['text']}</div>",
+                        f"<div class='event'>{ev['start']} - {ev['end']}<br>{ev['text']}</div>",
                         unsafe_allow_html=True
                     )
 
             st.markdown("</div>", unsafe_allow_html=True)
 
-            if st.button("", key=f"day_{date_str}"):
+            # Unsichtbarer Button für jeden Tag
+            if st.button(" ", key=f"day_{date_str}"):
                 st.session_state.selected_day = date_str
+                st.session_state.edit_index = None
 
 # ---------------------------
-# Event eingeben
+# Eventmanagement
 # ---------------------------
-if "selected_day" in st.session_state:
+if st.session_state.selected_day:
     st.markdown("---")
-    st.subheader(f"📌 {st.session_state.selected_day}")
+    date_str = st.session_state.selected_day
+    st.subheader(f"📌 {date_str}")
 
-    col1, col2 = st.columns(2)
+    events = st.session_state.events.get(date_str, [])
 
-    with col1:
-        text = st.text_input("Termin")
+    # Bestehende Events listen mit Bearbeiten / Löschen
+    if events:
+        for idx, ev in enumerate(events):
+            st.markdown(f"**{ev['text']}** ({ev['start']} - {ev['end']})")
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("✏️ Bearbeiten", key=f"edit_{date_str}_{idx}"):
+                    st.session_state.edit_index = idx
+            with col2:
+                if st.button("🗑️ Löschen", key=f"del_{date_str}_{idx}"):
+                    events.pop(idx)
+                    st.session_state.events[date_str] = events
+                    # Persist to file
+                    data_manager.save_user_data(st.session_state.events, 'calendar_events.json')
+                    st.rerun()
 
-    with col2:
-        time = st.time_input("Zeit")
+    st.markdown("---")
 
-    if st.button("Speichern"):
-        if st.session_state.selected_day not in st.session_state.events:
-            st.session_state.events[st.session_state.selected_day] = []
+    # Neues oder zu bearbeitendes Event
+    if st.session_state.edit_index is not None:
+        edit_event = events[st.session_state.edit_index]
+        st.subheader("🔧 Termin bearbeiten")
+        text = st.text_input("Titel", value=edit_event['text'])
+        col1, col2 = st.columns(2)
+        with col1:
+            start_time = st.time_input("Beginn", value=datetime.strptime(edit_event['start'], "%H:%M").time())
+        with col2:
+            end_time = st.time_input("Ende", value=datetime.strptime(edit_event['end'], "%H:%M").time())
+    else:
+        st.subheader("➕ Neuer Termin")
+        text = st.text_input("Titel")
+        col1, col2 = st.columns(2)
+        with col1:
+            start_time = st.time_input("Beginn")
+        with col2:
+            end_time = st.time_input("Ende")
 
-        st.session_state.events[st.session_state.selected_day].append({
-            "text": text,
-            "time": time.strftime("%H:%M")
-        })
+    if st.button("💾 Speichern"):
+        if start_time >= end_time:
+            st.error("Endzeit muss nach der Startzeit liegen!")
+        else:
+            new_event = {
+                "text": text,
+                "start": start_time.strftime("%H:%M"),
+                "end": end_time.strftime("%H:%M"),
+            }
+            if date_str not in st.session_state.events:
+                st.session_state.events[date_str] = []
 
-        # 🔥 SPEICHERN !!!
-        data_manager.save_user_data(
-            st.session_state.events,
-            "calendar_events.json"
-        )
+            if st.session_state.edit_index is not None:
+                st.session_state.events[date_str][st.session_state.edit_index] = new_event
+                st.session_state.edit_index = None
+            else:
+                st.session_state.events[date_str].append(new_event)
 
-        st.success("Gespeichert!")
-        st.rerun()
-
+            # Persist to file
+            data_manager.save_user_data(st.session_state.events, 'calendar_events.json')
+            st.success("Termin gespeichert!")
+            st.rerun()
