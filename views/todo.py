@@ -7,16 +7,9 @@ from utils.data_manager import DataManager
 
 st.title("To-Do Liste 📝")
 
-# ---------------------------
-# Initialize DataManager
-# ---------------------------
 data_manager = DataManager()
 
-# ---------------------------
-# SESSION STATE (WICHTIG)
-# ---------------------------
 if "todo_df" not in st.session_state:
-    # Load todos from persisted file, or use empty DataFrame as default
     st.session_state.todo_df = data_manager.load_user_data(
         'todo.csv',
         initial_value=pd.DataFrame({
@@ -27,44 +20,32 @@ if "todo_df" not in st.session_state:
         parse_dates=['Fälligkeit']
     )
 
-# ---------------------------
-# EINGABE
-# ---------------------------
 col1, col2 = st.columns(2)
 
 with col1:
     selected_date = st.date_input("Fälligkeit", value=date.today())
-
 with col2:
     entry = st.text_input("Eintrag")
-
-if st.button("➕ Eintrag hinzufügen"):
+if st.button("Eintrag hinzufügen"):
     if entry:
         st.session_state.todo_df = add_todo(
             st.session_state.todo_df,
             selected_date,
             entry
         )
-        # Persist to file
         data_manager.save_user_data(st.session_state.todo_df, 'todo.csv')
         st.success("Eintrag gespeichert!")
         st.rerun()
 
 st.markdown("---")
 
-# ---------------------------
-# DATA CLEANING (KRITISCH!)
-# ---------------------------
 df = st.session_state.todo_df.copy()
 
 df["Erledigt"] = df["Erledigt"].fillna(False).astype(bool)
 df["Eintrag"] = df["Eintrag"].fillna("").astype(str)
 df["Fälligkeit"] = pd.to_datetime(df["Fälligkeit"], errors="coerce")
 
-# ---------------------------
-# ANZEIGE
-# ---------------------------
-st.subheader("🗂️ Deine Einträge")
+st.subheader("Deine Einträge")
 
 edited_df = st.data_editor(
     df,
@@ -78,28 +59,21 @@ edited_df = st.data_editor(
 )
 
 st.session_state.todo_df = edited_df
-# Persist changes to file
 data_manager.save_user_data(st.session_state.todo_df, 'todo.csv')
 
-# ---------------------------
-# BUTTONS
-# ---------------------------
 col1, col2 = st.columns(2)
-
 with col1:
-    if st.button("🧹 Alle Einträge löschen"):
+    if st.button("Alle Einträge löschen"):
         st.session_state.todo_df = pd.DataFrame({
             "Fälligkeit": pd.Series(dtype="datetime64[ns]"),
             "Eintrag": pd.Series(dtype="str"),
             "Erledigt": pd.Series(dtype="bool")
         })
-        # Persist to file
         data_manager.save_user_data(st.session_state.todo_df, 'todo.csv')
         st.rerun()
 
 with col2:
-    if st.button("☑️ Erledigte löschen"):
+    if st.button("Erledigte löschen"):
         st.session_state.todo_df = remove_done(st.session_state.todo_df)
-        # Persist to file
         data_manager.save_user_data(st.session_state.todo_df, 'todo.csv')
         st.rerun()

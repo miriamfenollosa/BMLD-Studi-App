@@ -162,6 +162,29 @@ class DataManager:
         dh = self._get_data_handler('user_data_' + username)
         dh.save(file_name, data)
 
+    def delete_user_data(self, file_name: str) -> None:
+        """
+        Delete a user-specific data file.
+
+        Args:
+            file_name (str): Name of the file to delete.
+        """
+        username = st.session_state.get('username')
+        if username is None:
+            st.error("DataManager: No user logged in, cannot delete data")
+            return
+        
+        dh = self._get_data_handler('user_data_' + username)
+        full_path = dh._resolve_path(file_name)
+        
+        try:
+            if self.fs.exists(full_path):
+                self.fs.rm(full_path)
+            else:
+                st.warning(f"DataManager: Datei '{file_name}' existiert nicht")
+        except Exception as e:
+            st.error(f"DataManager: Fehler beim Löschen von '{file_name}': {e}")
+
     @staticmethod
     def append_record(data, record_dict):
         """

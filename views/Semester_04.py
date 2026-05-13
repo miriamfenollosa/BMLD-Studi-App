@@ -7,11 +7,8 @@ from functions.schnittrechner_01 import (
 )
 from utils.data_manager import DataManager
 
-st.title("📚 4. Semester (32 ECTS)")
+st.title("4. Semester (32 ECTS) 📚")
 
-# ---------------------------
-# Initialize DataManager
-# ---------------------------
 data_manager = DataManager()
 
 module_data = [
@@ -24,9 +21,7 @@ module_data = [
     {"Bereich": "Praktikum", "Modul": "Praxisreflexion und interprofessionelles Handeln", "ECTS": 2},
 ]
 
-# Session State
 if "df_sem4" not in st.session_state:
-    # Load grades from persisted file, or create empty DataFrame with module data
     default_df = pd.DataFrame(module_data)
     default_df["Note"] = None
     default_df["Bestanden"] = None
@@ -36,7 +31,6 @@ if "df_sem4" not in st.session_state:
         initial_value=default_df
     )
     
-    # Clean up data types: convert Note to float, Bestanden to bool, handle NaN
     loaded_df["Note"] = pd.to_numeric(loaded_df["Note"], errors="coerce")
     loaded_df["Bestanden"] = loaded_df["Bestanden"].fillna(False).astype(bool)
     
@@ -50,7 +44,6 @@ edited_dfs = []
 for bereich in bereiche:
     st.subheader(bereich)
     teil_df = df[df["Bereich"] == bereich]
-
     if bereich == "Praktikum":
         edited = st.data_editor(
             teil_df,
@@ -81,7 +74,6 @@ for bereich in bereiche:
         )
 
         schnitt_bereich = berechne_bereichsschnitt(edited, bereich)
-
         if schnitt_bereich is not None:
             st.info(f"📊 Schnitt {bereich}: {schnitt_bereich:.2f}")
         else:
@@ -89,21 +81,16 @@ for bereich in bereiche:
 
     edited_dfs.append(edited)
 
-# Zusammenführen
 neues_df = pd.concat(edited_dfs).reset_index(drop=True)
 st.session_state.df_sem4 = neues_df
 
-# Persist grades to file
 data_manager.save_user_data(st.session_state.df_sem4, 'semester_04_grades.csv')
 
 st.markdown("---")
 
-# Gesamtberechnung
 if st.button("📊 Semesterschnitt berechnen"):
-
     ohne_praktikum = neues_df[neues_df["Bereich"] != "Praktikum"]
     schnitt = berechne_schnitt(ohne_praktikum)
-
     if schnitt is None:
         st.error("Bitte Noten eingeben.")
     else:
@@ -112,8 +99,8 @@ if st.button("📊 Semesterschnitt berechnen"):
         status = prüfe_praktikum(neues_df)
 
         if status == "bestanden":
-            st.success("✅ Praktikum bestanden")
+            st.success("Praktikum bestanden")
         elif status == "nicht bestanden":
-            st.error("❌ Praktikum nicht bestanden")
+            st.error("Praktikum nicht bestanden")
         else:
-            st.warning("⚠️ Praktikum noch nicht bewertet")
+            st.warning("Praktikum noch nicht bewertet")

@@ -1,67 +1,40 @@
 import streamlit as st
-from supabase import create_client, Client
 from PIL import Image
 import io
+from utils.data_manager import DataManager
 
-# ─────────────────────────────────────────────
-# 1. SUPABASE VERBINDUNG
-# ─────────────────────────────────────────────
-@st.cache_resource
-def init_supabase() -> Client:
-    return create_client(
-        st.secrets["SUPABASE_URL"],
-        st.secrets["SUPABASE_KEY"]
-    )
+st.title("Stundenplan")
 
-supabase = init_supabase()
-BUCKET = "stundenplaene"
+data_manager = DataManager()
 
-# ─────────────────────────────────────────────
-# 2. EINGELOGGTEN BENUTZER HOLEN
-#    (Login läuft bereits über app.py / LoginManager)
-# ─────────────────────────────────────────────
-username = st.session_state.get("username")  # z.B. "max_mustermann"
-name = st.session_state.get("name")          # z.B. "Max Mustermann"
+username = st.session_state.get("username")
+name = st.session_state.get("name")
 
-# ─────────────────────────────────────────────
-# 3. HILFSFUNKTIONEN
-# ─────────────────────────────────────────────
-def upload_image(username, img_bytes):
-    file_path = f"{username}/stundenplan.png"
+def fix_image_orientation(image):
+    """Fix image orientation based on EXIF data."""
     try:
-        supabase.storage.from_(BUCKET).upload(
-            path=file_path,
-            file=img_bytes,
-            file_options={"content-type": "image/png", "upsert": "true"}
-        )
-        return True, None
-    except Exception as e:
-        return False, str(e)
+        from PIL import ExifTags
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation':
+                break
+        
+        exif = image._getexif()
+        if exif is not None:
+            exif_dict = dict(exif.items())
+            if orientation in exif_dict:
+                orientation_value = exif_dict[orientation]
+                if orientation_value == 3:
+                    image = image.rotate(180, expand=True)
+                elif orientation_value == 6:
+                    image = image.rotate(270, expand=True)
+                elif orientation_value == 8:
+                    image = image.rotate(90, expand=True)
+    except (AttributeError, KeyError, IndexError):
+        pass
+    
+    return image
 
-def load_image(username):
-    file_path = f"{username}/stundenplan.png"
-    try:
-        response = supabase.storage.from_(BUCKET).download(file_path)
-        return response
-    except Exception:
-        return None
-
-def delete_image(username):
-    file_path = f"{username}/stundenplan.png"
-    try:
-        supabase.storage.from_(BUCKET).remove([file_path])
-        return True
-    except Exception:
-        return False
-
-# ─────────────────────────────────────────────
-# 4. HAUPTBEREICH
-# ─────────────────────────────────────────────
-st.title("📅 Stundenplan")
-st.write(f"Willkommen, **{name}**!")
-
-# ── BILD HOCHLADEN ──
-st.markdown("### 📤 Bild hochladen")
+st.markdown("### Bild hochladen")
 uploaded_file = st.file_uploader(
     "Lade hier Bilder deiner Stunden-/Übungspläne hoch",
     type=["png", "jpg", "jpeg"]
@@ -69,45 +42,51 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-
+    image = fix_image_orientation(image)
     img_bytes = io.BytesIO()
     image.save(img_bytes, format="PNG")
-    img_bytes = img_bytes.getvalue()
-
+    img_bytes_data = img_bytes.getvalue()
     st.image(image, caption="Vorschau", use_container_width=True)
 
-    if st.button("💾 Speichern", use_container_width=True):
-        success, error = upload_image(username, img_bytes)
-        if success:
+    if st.button("Speichern", use_container_width=True):
+        try:
+            data_manager.save_user_data(img_bytes_data, 'stundenplan.png')
             st.success("✅ Bild erfolgreich gespeichert!")
             st.rerun()
-        else:
-            st.error(f"❌ Fehler beim Speichern: {error}")
+        except Exception as e:
+            st.error(f"❌ Fehler beim Speichern: {e}")
 
-# ── GESPEICHERTES BILD ──
 st.markdown("---")
-st.markdown("### 💾 Dein gespeicherter Stundenplan")
+st.markdown("### Dein gespeicherter Stundenplan")
 
-saved_image = load_image(username)
+try:
+    saved_image_bytes = data_manager.load_user_data(
+        'stundenplan.png',
+        initial_value=None
+    )
+    
+    if saved_image_bytes is not None:
+        st.image(saved_image_bytes, caption="Dein gespeicherter Stundenplan", use_container_width=True)
 
-if saved_image is not None:
-    st.image(saved_image, caption="Dein gespeicherter Stundenplan", use_container_width=True)
-
-    col1, col2 = st.columns(2)
-    with col1:
-        st.download_button(
-            label="📥 Herunterladen",
-            data=saved_image,
-            file_name="stundenplan.png",
-            mime="image/png",
-            use_container_width=True
-        )
-    with col2:
-        if st.button("🗑️ Bild löschen", use_container_width=True):
-            if delete_image(username):
-                st.warning("Bild wurde gelöscht.")
-                st.rerun()
-            else:
-                st.error("Fehler beim Löschen.")
-else:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.download_button(
+                label="Herunterladen",
+                data=saved_image_bytes,
+                file_name="stundenplan.png",
+                mime="image/png",
+                use_container_width=True
+            )
+        with col2:
+            if st.button("Bild löschen", use_container_width=True):
+                try:
+                    data_manager.delete_user_data('stundenplan.png')
+                    st.warning("Bild wurde gelöscht.")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Fehler beim Löschen: {e}")
+    else:
+        st.info("Du hast noch kein Bild gespeichert. Lade oben eines hoch!")
+        
+except Exception as e:
     st.info("Du hast noch kein Bild gespeichert. Lade oben eines hoch!")
