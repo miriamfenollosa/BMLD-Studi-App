@@ -62,7 +62,7 @@ with st.expander("Zielmengenrechner"):
         st.session_state.history = history
 
         data_manager.save_user_data(st.session_state.history, 'water_tracker.json')
-        st.success(f"✅ Ziel auf {empfehlung:.2f} L gesetzt!")
+        st.success(f"Ziel auf {empfehlung:.2f} L gesetzt!")
         st.rerun()
 
 goal = st.session_state.goal
@@ -100,6 +100,6 @@ total = calculate_water(today_data)
 st.markdown(f"###  Getrunken: {total:.2f} L")
 
 if total >= goal:
-    st.success(f"🎯 Ziel erreicht! ({goal:.2f} L)")
+    st.success(f"Ziel erreicht! ({goal:.2f} L)")
 else:
     st.info(f"Ziel: {goal:.2f} L ({num_glasses} Gläser)")

@@ -25,7 +25,7 @@ module_data = [
     {"Bereich": "Angewandte Forschung", "Modul": "Projektarbeit", "ECTS": 6},
     {"Bereich": "Angewandte Forschung", "Modul": "Forschungsmethoden 1", "ECTS": 2},
 
-    {"Bereich": "Gesellschaft, Kultur und Gesundheit", "Modul": "Module gemäß separater Liste", "ECTS": 3},
+    {"Bereich": "Gesellschaft, Kultur und Gesundheit", "Modul": "Module gemäss separater Liste", "ECTS": 3},
 ]
 
 if "df_sem5" not in st.session_state:
@@ -104,4 +104,3 @@ if st.button("📊 Semesterschnitt berechnen"):
         st.error("Bitte Noten eingeben.")
     else:
         st.success(f"Semesterschnitt: {schnitt:.2f}")
-        status = prüfe_praktikum(neues_df)

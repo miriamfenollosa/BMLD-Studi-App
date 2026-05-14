@@ -51,10 +51,10 @@ if uploaded_file is not None:
     if st.button("Speichern", use_container_width=True):
         try:
             data_manager.save_user_data(img_bytes_data, 'stundenplan.png')
-            st.success("✅ Bild erfolgreich gespeichert!")
+            st.success("Bild erfolgreich gespeichert!")
             st.rerun()
         except Exception as e:
-            st.error(f"❌ Fehler beim Speichern: {e}")
+            st.error(f"Fehler beim Speichern: {e}")
 
 st.markdown("---")
 st.markdown("### Dein gespeicherter Stundenplan")

@@ -98,4 +98,3 @@ if st.button("📊 Semesterschnitt berechnen"):
         st.error("Bitte Noten eingeben.")
     else:
         st.success(f"Semesterschnitt: {schnitt:.2f}")
-        status = prüfe_praktikum(neues_df)

@@ -11,6 +11,9 @@ st.title("4. Semester (32 ECTS) 📚")
 
 data_manager = DataManager()
 
+if "show_sem4_result" not in st.session_state:
+    st.session_state.show_sem4_result = False
+
 module_data = [
     {"Bereich": "Analyseprozesse und Labordiagnostik 3", "Modul": "Immunhämatologie und Transfusionsmedizin 2", "ECTS": 2},
     {"Bereich": "Analyseprozesse und Labordiagnostik 3", "Modul": "Medizinische Genetik 1", "ECTS": 2},
@@ -25,15 +28,22 @@ if "df_sem4" not in st.session_state:
     default_df = pd.DataFrame(module_data)
     default_df["Note"] = None
     default_df["Bestanden"] = None
-    
+
     loaded_df = data_manager.load_user_data(
         'semester_04_grades.csv',
         initial_value=default_df
     )
-    
+
     loaded_df["Note"] = pd.to_numeric(loaded_df["Note"], errors="coerce")
-    loaded_df["Bestanden"] = loaded_df["Bestanden"].fillna(False).astype(bool)
-    
+
+    if "Bestanden" in loaded_df.columns:
+        loaded_df["Bestanden"] = loaded_df["Bestanden"].apply(
+            lambda x: True if str(x).lower() == "true"
+            else (False if str(x).lower() == "false" else (x if pd.isna(x) else x))
+        )
+    else:
+        loaded_df["Bestanden"] = pd.NA
+
     st.session_state.df_sem4 = loaded_df
 
 df = st.session_state.df_sem4
@@ -44,6 +54,7 @@ edited_dfs = []
 for bereich in bereiche:
     st.subheader(bereich)
     teil_df = df[df["Bereich"] == bereich]
+
     if bereich == "Praktikum":
         edited = st.data_editor(
             teil_df,
@@ -89,18 +100,43 @@ data_manager.save_user_data(st.session_state.df_sem4, 'semester_04_grades.csv')
 st.markdown("---")
 
 if st.button("📊 Semesterschnitt berechnen"):
+    st.session_state.show_sem4_result = True
+
+if st.session_state.show_sem4_result:
+
     ohne_praktikum = neues_df[neues_df["Bereich"] != "Praktikum"]
     schnitt = berechne_schnitt(ohne_praktikum)
+
     if schnitt is None:
         st.error("Bitte Noten eingeben.")
     else:
         st.success(f"Semesterschnitt: {schnitt:.2f}")
 
-        status = prüfe_praktikum(neues_df)
+    praktika_df = neues_df[neues_df["Bereich"] == "Praktikum"].copy()
 
-        if status == "bestanden":
-            st.success("Praktikum bestanden")
-        elif status == "nicht bestanden":
-            st.error("Praktikum nicht bestanden")
-        else:
-            st.warning("Praktikum noch nicht bewertet")
+    praktika_df["Bestanden_status"] = praktika_df["Bestanden"].apply(
+        lambda x: "unknown" if pd.isna(x) else ("passed" if bool(x) else "failed")
+    )
+
+    num = len(praktika_df)
+    num_pass = (praktika_df["Bestanden_status"] == "passed").sum()
+    num_fail = (praktika_df["Bestanden_status"] == "failed").sum()
+    num_unknown = (praktika_df["Bestanden_status"] == "unknown").sum()
+
+    if num > 0 and num_pass == num and num_unknown == 0:
+        st.success("Alle Praktika bestanden!")
+
+    elif num > 0 and num_fail == num and num_unknown == 0:
+        st.error("Alle Praktika nicht bestanden!")
+
+    else:
+        for _, row in praktika_df.iterrows():
+            modul = row["Modul"]
+            status = row["Bestanden_status"]
+
+            if status == "passed":
+                st.success(f"{modul}: Bestanden")
+            elif status == "failed":
+                st.error(f"{modul}: Nicht bestanden")
+            else:
+                st.warning(f"{modul}: Noch nicht bewertet")

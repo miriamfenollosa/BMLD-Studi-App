@@ -5,7 +5,6 @@ from utils.data_manager import DataManager
 
 st.title("Kalender 📅")
 
-
 data_manager = DataManager()
 
 if "current_month" not in st.session_state:
@@ -49,11 +48,15 @@ col1, col2, col3 = st.columns([1,2,1])
 with col1:
     if st.button("←"):
         st.session_state.current_month = prev_month(current)
+        st.session_state.selected_day = None 
+        st.rerun()
 with col2:
     st.subheader(current.strftime("%B %Y"))
 with col3:
     if st.button("→"):
         st.session_state.current_month = next_month(current)
+        st.session_state.selected_day = None 
+        st.rerun()
 
 days_header = ["Mo","Di","Mi","Do","Fr","Sa","So"]
 cols = st.columns(7)
@@ -102,7 +105,9 @@ if st.session_state.selected_day:
 
     if events:
         for idx, ev in enumerate(events):
-            st.markdown(f"**{ev['text']}** ({ev['start']} - {ev['end']})")
+            is_allday = ev.get('all_day', False)
+            time_display = "Ganztägig" if is_allday else f"({ev['start']} - {ev['end']})"
+            st.markdown(f"**{ev['text']}** {time_display}")
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("Bearbeiten", key=f"edit_{date_str}_{idx}"):
@@ -111,42 +116,63 @@ if st.session_state.selected_day:
                 if st.button("Löschen", key=f"del_{date_str}_{idx}"):
                     events.pop(idx)
                     st.session_state.events[date_str] = events
-                    # Persist to file
                     data_manager.save_user_data(st.session_state.events, 'calendar_events.json')
                     st.rerun()
 
     st.markdown("---")
 
+    if st.session_state.edit_index is not None and st.session_state.edit_index >= len(events):
+        st.session_state.edit_index = None
+
     if st.session_state.edit_index is not None:
         edit_event = events[st.session_state.edit_index]
-        st.subheader("🔧 Termin bearbeiten")
+        st.subheader("Termin bearbeiten")
         text = st.text_input("Titel", value=edit_event['text'])
-        col1, col2 = st.columns(2)
-        with col1:
-            start_time = st.time_input("Beginn", value=datetime.strptime(edit_event['start'], "%H:%M").time())
-        with col2:
-            end_time = st.time_input("Ende", value=datetime.strptime(edit_event['end'], "%H:%M").time())
+        is_allday = st.checkbox("Ganztägig", value=edit_event.get('all_day', False))
+        
+        if not is_allday:
+            col1, col2 = st.columns(2)
+            with col1:
+                start_time = st.time_input("Beginn", value=datetime.strptime(edit_event['start'], "%H:%M").time())
+            with col2:
+                end_time = st.time_input("Ende", value=datetime.strptime(edit_event['end'], "%H:%M").time())
+        else:
+            start_time = None
+            end_time = None
     else:
         st.subheader("Neuer Termin")
         text = st.text_input("Titel")
-        col1, col2 = st.columns(2)
-        with col1:
-            start_time = st.time_input("Beginn")
-        with col2:
-            end_time = st.time_input("Ende")
+        is_allday = st.checkbox("Ganztägig", value=False)
+        
+        if not is_allday:
+            col1, col2 = st.columns(2)
+            with col1:
+                start_time = st.time_input("Beginn")
+            with col2:
+                end_time = st.time_input("Ende")
+        else:
+            start_time = None
+            end_time = None
 
     if st.button("Speichern"):
-        if start_time >= end_time:
+        if not is_allday and start_time >= end_time:
             st.error("Endzeit muss nach der Startzeit liegen!")
+        elif not text:
+            st.error("Bitte Titel eingeben!")
         else:
             new_event = {
                 "text": text,
-                "start": start_time.strftime("%H:%M"),
-                "end": end_time.strftime("%H:%M"),
+                "all_day": is_allday,
             }
+            
+            if not is_allday:
+                new_event["start"] = start_time.strftime("%H:%M")
+                new_event["end"] = end_time.strftime("%H:%M")
+            else:
+                new_event["start"] = "00:00"
+                new_event["end"] = "23:59"
             if date_str not in st.session_state.events:
                 st.session_state.events[date_str] = []
-
             if st.session_state.edit_index is not None:
                 st.session_state.events[date_str][st.session_state.edit_index] = new_event
                 st.session_state.edit_index = None
