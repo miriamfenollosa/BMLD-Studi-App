@@ -1,37 +1,57 @@
-# Roadmap
-### V01: fork
-- Fork BMLD-Inf2-BMI-CalcV3
+# Produkt-Roadmap
 
-### V02: Abgabe 12.04.2026
-Doc Ordner erstellt (in Views) und folgende Inhalte hochgeladen und ergänzt:
-- Persona.md
-- Produkt-Roadmap.md
-- Wireframe-Nutzertest.md
-- Wireframes.jpeg
+### V01: Projektstart
+- Fork von BMLD-Inf2-BMI-CalcV3
+- Streamlit-App lauffähig machen
+- Grundstruktur der App erstellen
+- Unterseiten einfügen
 
-README.md File ergänzt
+### V02: Konzeptphase
+- Persona erstellen
+- Wireframes erstellen
+- Wireframe-Nutzertest durchführen
+- README ergänzen
+- Dokumentationen im docs-Ordner einfügen
 
-### V03: Rechner programmieren
-Notenrechner programmieren
+### V03: Notenrechner
+- Module und ECTS anzeigen
+- Noten eingeben
+- Modulgruppenschnitt berechnen
+- Semesterschnitt berechnen
+- Praktikum bestanden / nicht bestanden anzeigen
 
-### V04: Verknüpfung zu Streamlit
-App mit Streamlit verbinden
+### V04: Stundenplan
+- Stundenplan in die App integrieren
+- Bild hochladen können
 
-### V05: Kalender 
-Kalender einfügen / programmieren
+### V05: Kalender
+- Kalenderansicht hinzufügen
+- Termine einfügen und bearbeiten können
 
-### V06: Stundenplan
-Stundenplan einfügen / programmieren
+### V06: To-Do-Liste
+- Aufgaben hinzufügen
+- Aufgaben abhaken und verwalten
 
-### V07: To-Do-Liste
-To-Do-Liste einfügen / programmieren
+### V07: Wassertracker
+- Wasserbedarf berechnen
+- Wasserzufuhr erfassen
+- Tagesübersicht anzeigen
 
-### V08: Wasser-Trink-Tracker
-Wasser-Trink-Tracker programmieren
+### V08: Datenspeicherung
+- Speicherung der Noten integrieren
+- Speicherung des Stundenplans integrieren
+- Speicherung der Termine integrieren
+- Speicherung der To-Do-Liste integrieren
+- Speicherung der Trinkmenge integrieren
+- Speicherung mittels DataManager umsetzen
 
-### V9: Login und Switch-Drive
-- Userlogin erstellen
-- Verbindung zu Switch-Drive
-- Speicher hinzufügen
+### V09: Login & Personalisierung
+- Login-Funktion integrieren
+- Verbindung mit SwitchDrive
+- Personalisierte Daten speichern
 
-### V10: Abgabe 
+### V10: Finalisierung für Abgabe
+- Fehler beheben
+- Benutzeroberfläche verbessern
+- App testen und optimieren
+- Abschlussabgabe
